@@ -114,3 +114,54 @@ REMOVE_UNUSED_DEPS="true"  # Verwaiste Pakete automatisch entfernen
 ```
 
 Einfach vor dem Ausführen anpassen oder die Datei lokal bearbeiten.
+
+---
+
+### `ssh-disable.sh` – SSH deaktivieren (Proxmox CT)
+Deaktiviert SSH vollständig – Zugang danach **nur noch über die Proxmox Web UI Console**.
+
+> ⚠️ Sicherstellen dass die Proxmox Web UI erreichbar ist, bevor dieser Script ausgeführt wird!
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/ssh-disable.sh)
+```
+
+**Was es macht:**
+- Fragt zur Sicherheit nochmal nach Bestätigung
+- Zeigt aktive SSH-Sessions an bevor sie getrennt werden
+- Stoppt und deaktiviert SSH-Dienst und SSH-Socket
+- Setzt `AllowUsers NOBODY_PLACEHOLDER` als Fallback in sshd_config
+- Erstellt ein Backup der sshd_config
+- Schreibt Statusdatei nach `/etc/aeterna/ssh-status`
+
+---
+
+### `ssh-enable.sh` – SSH reaktivieren mit Key-only (Proxmox CT)
+Reaktiviert SSH mit **ausschließlich Key-Authentifizierung** – kein Passwort-Login möglich.
+
+> ⚠️ Diesen Script immer über die **Proxmox Web UI Console** ausführen, nicht über eine bestehende SSH-Session!
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/ssh-enable.sh)
+```
+
+**Was es macht:**
+- Erkennt bereits vorhandene SSH Keys und zeigt sie an
+- Fragt nach dem Public Key und validiert das Format (`ssh-ed25519`, `ssh-rsa`, etc.)
+- Mehrere Keys können nacheinander hinzugefügt werden
+- Fragt nach dem gewünschten SSH-Port (Enter = Standard 22)
+- Installiert OpenSSH Server falls nicht vorhanden
+- Schreibt eine neue, saubere `sshd_config` mit Key-only Authentifizierung
+- Gibt am Ende die fertige Login-Zeile aus
+
+**Public Key auf deinem PC anzeigen:**
+```bash
+cat ~/.ssh/id_ed25519.pub
+# oder
+cat ~/.ssh/id_rsa.pub
+```
+
+**Falls noch kein Key vorhanden – neuen erstellen:**
+```bash
+ssh-keygen -t ed25519 -C "mein-server"
+```

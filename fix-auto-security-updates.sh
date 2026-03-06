@@ -11,7 +11,7 @@
 #
 # Ausführen als root: bash fix-auto-security-updates.sh
 # =============================================================================
-set -euo pipefail
+set -uo pipefail
 
 RED='\033[0;31m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; CYAN='\033[0;36m'; NC='\033[0m'
 info()    { echo -e "${GREEN}[INFO]${NC}  $*"; }

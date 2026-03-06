@@ -36,6 +36,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates
 ### `fix-auto-security-updates.sh` – Bereits eingerichtete Systeme
 Für Server auf denen das **alte Script** bereits ausgeführt wurde und die bekannten Bugs noch aktiv sind.
 
+Das alte Script war nie auf GitHub der fix ist also nur für mich (:
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/fix-auto-security-updates.sh)
 ```

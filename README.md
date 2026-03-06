@@ -1,4 +1,4 @@
-# Auto-Updates – powered by Aeterna
+# Auto-Updates – powered by Aeterna™
 
 Automatische Sicherheitsupdates für Debian-Server (11 Bullseye / 12 Bookworm).  
 Installiert und konfiguriert `unattended-upgrades` so, dass **ausschließlich Sicherheitspatches** automatisch eingespielt werden – ohne manuelle Eingriffe.

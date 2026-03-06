@@ -1,7 +1,10 @@
 # Auto-Updates – powered by Aeterna™
 
-Automatische Sicherheitsupdates für Debian-Server (11 Bullseye / 12 Bookworm).  
-Installiert und konfiguriert `unattended-upgrades` so, dass **ausschließlich Sicherheitspatches** automatisch eingespielt werden – ohne manuelle Eingriffe.
+> **powered by Aeterna™**  
+> Dieses Repository und alle enthaltenen Scripts wurden mithilfe von KI (Claude by Anthropic) erstellt.  
+> Alle Scripts vor der Ausführung prüfen – keine Haftung für Schäden.
+
+Automatische Sicherheitsupdates und System-Monitoring für Debian-Server (11 Bullseye / 12 Bookworm).
 
 ---
 
@@ -36,7 +39,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates
 ### `fix-auto-security-updates.sh` – Bereits eingerichtete Systeme
 Für Server auf denen das **alte Script** bereits ausgeführt wurde und die bekannten Bugs noch aktiv sind.
 
-Das alte Script war nie auf GitHub der fix ist also nur für mich (:
+Das alte Script war nie auf GitHub – der Fix ist also nur für mich (:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/fix-auto-security-updates.sh)
@@ -49,6 +52,37 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates
 - Installiert `needrestart` falls fehlend
 
 Das Script führt zuerst einen **Vor-Check** durch und zeigt gefundene Probleme an, bevor es Änderungen macht.
+
+---
+
+### `debian-healthcheck.sh` – System-Diagnose & interaktiver Fix-Modus
+Prüft das System auf Probleme und bietet an, gefundene Probleme **einzeln mit Bestätigung** zu beheben.
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/debian-healthcheck.sh)
+```
+
+**Was geprüft wird:**
+
+| Bereich | Checks |
+|---|---|
+| Updates & Pakete | Ausstehende Sicherheits-Updates, beschädigte Pakete, Neustart-Bedarf |
+| Sicherheit | SSH-Konfiguration, offene Ports, Brute-Force-Versuche, fail2ban, Firewall |
+| Ressourcen | CPU Load, RAM, Swap, alle Festplatten |
+| Dienste | Fehlgeschlagene systemd-Dienste, wichtige Kern-Dienste |
+| Logs | Kernel-Fehler, OOM-Killer, Festplatten I/O-Fehler |
+| NTP | Zeitsynchronisation |
+
+**Fix-Modus:**  
+Nach dem Check werden alle behebbaren Probleme gesammelt und einzeln zur Bestätigung angeboten.
+
+```
+[1/4] 3 Sicherheits-Updates installieren
+▶ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+Ausführen? [j/n/a=alle/q=abbrechen]:
+```
+
+Mit `a` werden alle verbleibenden Fixes ohne weitere Nachfrage ausgeführt. Mit `n` oder Enter wird ein Fix übersprungen. Mit `q` wird der Fix-Modus abgebrochen.
 
 ---
 
@@ -69,7 +103,7 @@ unattended-upgrades --debug
 
 ## Konfiguration anpassen
 
-Beide Scripts haben oben einen Konfigurationsblock:
+Die Setup- und Fix-Scripts haben oben einen Konfigurationsblock:
 
 ```bash
 MAIL_ADDRESS="root"        # E-Mail für Fehlerberichte

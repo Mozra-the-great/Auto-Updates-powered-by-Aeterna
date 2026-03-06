@@ -21,6 +21,10 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 
 [[ $EUID -eq 0 ]] || error "Bitte als root ausführen (sudo bash $0)"
 
+# --- Branding ---
+echo -e "\n  \033[1mpowered by Aeterna™\033[0m"
+echo -e "  \033[0;36mDieses Script wurde mithilfe von KI (Claude by Anthropic) erstellt.\033[0m\n"
+
 CONF51="/etc/apt/apt.conf.d/51unattended-security-only"
 CONF50="/etc/apt/apt.conf.d/50unattended-upgrades"
 

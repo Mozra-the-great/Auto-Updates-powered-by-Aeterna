@@ -50,7 +50,7 @@ fi
 # Check 2: ::clear fehlt?
 if [[ -f "$CONF51" ]] && ! grep -q "Origins-Pattern::clear" "$CONF51"; then
     warn "BUG GEFUNDEN: Origins-Pattern::clear fehlt in 51er-Datei → Merge-Bug aktiv"
-    ((ISSUES++))
+    ISSUES=$((ISSUES + 1))
 else
     info "Origins-Pattern::clear vorhanden ✓"
 fi
@@ -58,7 +58,7 @@ fi
 # Check 3: Automatic-Reboot fehlt?
 if [[ -f "$CONF51" ]] && ! grep -q "Automatic-Reboot" "$CONF51"; then
     warn "BUG GEFUNDEN: Automatic-Reboot nicht konfiguriert"
-    ((ISSUES++))
+    ISSUES=$((ISSUES + 1))
 else
     info "Automatic-Reboot konfiguriert ✓"
 fi
@@ -66,7 +66,7 @@ fi
 # Check 4: needrestart installiert?
 if ! dpkg -l needrestart &>/dev/null; then
     warn "needrestart nicht installiert"
-    ((ISSUES++))
+    ISSUES=$((ISSUES + 1))
 else
     info "needrestart installiert ✓"
 fi

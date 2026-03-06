@@ -15,6 +15,10 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 # --- Root-Check ---
 [[ $EUID -eq 0 ]] || error "Bitte als root ausführen (sudo bash $0)"
 
+# --- Branding ---
+echo -e "\n  \033[1mpowered by Aeterna™\033[0m"
+echo -e "  \033[0;36mDieses Script wurde mithilfe von KI (Claude by Anthropic) erstellt.\033[0m\n"
+
 # --- Konfiguration (hier anpassen) ---
 MAIL_ADDRESS="root"             # E-Mail für Fehlerberichte (z.B. "admin@example.com")
 MAIL_REPORT="on-change"        # "always" | "on-change" | "only-on-error" | "never"

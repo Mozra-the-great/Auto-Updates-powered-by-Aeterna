@@ -81,7 +81,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq \
     curl wget gnupg2 apt-transport-https ca-certificates \
-    lsb-release locales procps
+    lsb-release locales procps sudo
 ok "Abhängigkeiten installiert"
 
 # =============================================================================

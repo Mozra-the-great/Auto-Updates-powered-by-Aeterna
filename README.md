@@ -188,11 +188,14 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates
 
 **Was es macht:**
 - Prüft Systemvoraussetzungen (RAM, Disk, `vm.max_map_count`)
-- Lädt den offiziellen Wazuh Installer herunter und **verifiziert die SHA512-Prüfsumme** vor der Ausführung
+- Lädt den offiziellen Wazuh Installer herunter (mit User-Agent Header, mehrere Fallback-URLs)
+- Prüft ob die heruntergeladene Datei ein gültiges Shell-Script ist bevor sie ausgeführt wird
 - Installiert Wazuh Manager, Indexer und Dashboard (All-in-One)
 - Sichert alle generierten Passwörter nach `/root/wazuh-passwords.txt` (Rechte: 600)
 - Schließt Wazuh-Pakete von `unattended-upgrades` aus (Wazuh-Updates erfordern manuelle Migration)
 - Dauer: ca. 10–20 Minuten
+
+> **Hinweis:** Die `tr: write error`-Meldungen während der Zertifikatsgenerierung sind ein bekanntes LXC-Quirk und harmlos.
 
 Das Wazuh Dashboard ist danach erreichbar unter `https://<Container-IP>` (Zertifikats-Warnung beim ersten Aufruf bestätigen).
 

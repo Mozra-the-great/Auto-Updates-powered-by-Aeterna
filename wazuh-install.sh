@@ -100,30 +100,47 @@ cd "$WORK_DIR"
 echo ""
 info "Wazuh Installer herunterladen..."
 
-# -f: Fehler bei HTTP 4xx/5xx (verhindert dass AccessDenied-XML als Erfolg gilt)
-# -L: Redirects folgen
-curl -fsSL https://packages.wazuh.com/4.x/wazuh-install.sh -o wazuh-install.sh \
-    || error "Download von wazuh-install.sh fehlgeschlagen – Internetverbindung oder Wazuh-CDN prüfen"
+# Wazuh CDN erfordert einen User-Agent Header, sonst HTTP 403.
+# Primär: generische 4.x URL, Fallback: neueste bekannte Versionsurl
+WAZUH_URLS=(
+    "https://packages.wazuh.com/4.x/wazuh-install.sh"
+    "https://packages.wazuh.com/4.10/wazuh-install.sh"
+    "https://packages.wazuh.com/4.9/wazuh-install.sh"
+)
 
-# Sicherstellen dass wir wirklich ein Shell-Script haben und kein XML/HTML
-FIRST_LINE=$(head -1 wazuh-install.sh)
-if [[ "$FIRST_LINE" != "#!/"* ]]; then
-    error "Heruntergeladene Datei ist kein Shell-Script (erster Inhalt: ${FIRST_LINE:0:80})
-    Das Wazuh-CDN hat möglicherweise einen Fehler zurückgegeben.
-    Manuell prüfen: curl -I https://packages.wazuh.com/4.x/wazuh-install.sh"
-fi
-ok "wazuh-install.sh heruntergeladen und verifiziert ✓"
+DOWNLOAD_OK=0
+for URL in "${WAZUH_URLS[@]}"; do
+    info "Versuche: $URL"
+    if curl -fsSL -A "Wazuh-Installer/1.0" "$URL" -o wazuh-install.sh 2>/dev/null; then
+        FIRST_LINE=$(head -1 wazuh-install.sh 2>/dev/null)
+        if [[ "$FIRST_LINE" == "#!/"* ]]; then
+            ok "wazuh-install.sh heruntergeladen von: $URL ✓"
+            DOWNLOAD_OK=1
+            break
+        else
+            warn "Ungültige Antwort von $URL (${FIRST_LINE:0:60}) – nächste URL versuchen..."
+        fi
+    fi
+done
+
+[[ $DOWNLOAD_OK -eq 1 ]] || error "Wazuh Installer konnte von keiner URL heruntergeladen werden.
+    Manuell testen: curl -v -A 'Wazuh-Installer/1.0' https://packages.wazuh.com/4.x/wazuh-install.sh"
 
 # Konfig herunterladen
 info "Wazuh-Konfiguration herunterladen..."
-curl -fsSL https://packages.wazuh.com/4.x/config.yml -o config.yml 2>/dev/null \
-    || warn "config.yml nicht verfügbar – Standard wird vom Installer erzeugt"
-
-if [[ -f config.yml ]] && head -1 config.yml | grep -q "nodes"; then
-    MY_IP=$(hostname -I | awk '{print $1}')
-    sed -i "s/ip: .*/ip: \"$MY_IP\"/" config.yml || true
-    info "IP in config.yml gesetzt: $MY_IP"
-fi
+for URL in "https://packages.wazuh.com/4.x/config.yml" "https://packages.wazuh.com/4.10/config.yml" "https://packages.wazuh.com/4.9/config.yml"; do
+    if curl -fsSL -A "Wazuh-Installer/1.0" "$URL" -o config.yml 2>/dev/null; then
+        if head -1 config.yml 2>/dev/null | grep -qE "^nodes|^#"; then
+            MY_IP=$(hostname -I | awk '{print $1}')
+            sed -i "s/ip: .*/ip: \"$MY_IP\"/" config.yml || true
+            info "IP in config.yml gesetzt: $MY_IP"
+            break
+        fi
+    fi
+    warn "config.yml nicht verfügbar – Standard wird vom Installer erzeugt"
+    rm -f config.yml
+    break
+done
 
 # =============================================================================
 # Wazuh All-in-One Installation

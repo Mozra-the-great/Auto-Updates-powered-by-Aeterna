@@ -164,11 +164,30 @@ ok "Wazuh Agent installiert"
 
 OSSEC_CONF="/var/ossec/etc/ossec.conf"
 if [[ -f "$OSSEC_CONF" ]]; then
+    # Manager-IP sicherstellen
     if ! grep -q "$WAZUH_MANAGER" "$OSSEC_CONF"; then
         warn "Manager-IP nicht in ossec.conf – setze manuell..."
         sed -i "s|<address>.*</address>|<address>${WAZUH_MANAGER}</address>|g" "$OSSEC_CONF"
     fi
     ok "ossec.conf Manager-IP: $WAZUH_MANAGER ✓"
+
+    # Kommunikations-Port auf 1514 setzen (nicht 1515 = Enrollment-Port)
+    # Der apt-Installer setzt manchmal 1515 – das verhindert die Verbindung nach Enrollment.
+    sed -i 's|<port>1515</port>|<port>1514</port>|g' "$OSSEC_CONF"
+    ok "ossec.conf Kommunikations-Port: 1514 ✓"
+
+    # Enrollment aktiviert lassen (benötigt Port 1515 am Manager) –
+    # aber sicherstellen dass kein doppelter <enabled>-Eintrag existiert
+    # (passiert wenn das Script mehrfach läuft)
+    ENABLED_COUNT=$(grep -c "<enabled>" "$OSSEC_CONF" || echo 0)
+    if [[ $ENABLED_COUNT -gt 1 ]]; then
+        warn "Doppelter <enabled>-Eintrag in ossec.conf – bereinige..."
+        # Alle auf 'yes' setzen, dann Duplikate entfernen
+        sed -i '/<enrollment>/,/<\/enrollment>/{s/<enabled>.*<\/enabled>/<enabled>yes<\/enabled>/}' "$OSSEC_CONF"
+        # Zweiten yes-Eintrag im enrollment-Block entfernen
+        perl -i -0pe 's|(<enrollment>.*?)<enabled>yes</enabled>\s*<enabled>yes</enabled>|$1<enabled>yes</enabled>|s' "$OSSEC_CONF" 2>/dev/null || true
+        ok "ossec.conf Enrollment-Konfiguration bereinigt"
+    fi
 fi
 
 # =============================================================================

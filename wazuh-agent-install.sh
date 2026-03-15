@@ -70,6 +70,22 @@ else
 fi
 
 # =============================================================================
+# OS-Erkennung
+# =============================================================================
+
+OS_ID=$(grep "^ID=" /etc/os-release 2>/dev/null | cut -d= -f2 | tr -d '"')
+OS_CODENAME=$(grep "^VERSION_CODENAME=" /etc/os-release 2>/dev/null | cut -d= -f2 | tr -d '"')
+
+case "$OS_ID" in
+    debian|ubuntu|linuxmint|pop)
+        ok "OS erkannt: $OS_ID ($OS_CODENAME) – apt wird verwendet ✓"
+        ;;
+    *)
+        warn "OS '$OS_ID' nicht getestet – versuche trotzdem apt-basierte Installation"
+        ;;
+esac
+
+# =============================================================================
 # Abhängigkeiten
 # =============================================================================
 
@@ -138,6 +154,7 @@ if systemctl is-active --quiet wazuh-agent 2>/dev/null; then
     systemctl stop wazuh-agent 2>/dev/null || true
 fi
 
+# Repo für Debian und Ubuntu gleich – Wazuh nutzt "stable" für beide
 echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" \
     > /etc/apt/sources.list.d/wazuh.list
 

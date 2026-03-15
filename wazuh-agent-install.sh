@@ -176,18 +176,20 @@ if [[ -f "$OSSEC_CONF" ]]; then
     sed -i 's|<port>1515</port>|<port>1514</port>|g' "$OSSEC_CONF"
     ok "ossec.conf Kommunikations-Port: 1514 ✓"
 
-    # Enrollment aktiviert lassen (benötigt Port 1515 am Manager) –
-    # aber sicherstellen dass kein doppelter <enabled>-Eintrag existiert
-    # (passiert wenn das Script mehrfach läuft)
-    ENABLED_COUNT=$(grep -c "<enabled>" "$OSSEC_CONF" || echo 0)
-    if [[ $ENABLED_COUNT -gt 1 ]]; then
-        warn "Doppelter <enabled>-Eintrag in ossec.conf – bereinige..."
-        # Alle auf 'yes' setzen, dann Duplikate entfernen
-        sed -i '/<enrollment>/,/<\/enrollment>/{s/<enabled>.*<\/enabled>/<enabled>yes<\/enabled>/}' "$OSSEC_CONF"
-        # Zweiten yes-Eintrag im enrollment-Block entfernen
-        perl -i -0pe 's|(<enrollment>.*?)<enabled>yes</enabled>\s*<enabled>yes</enabled>|$1<enabled>yes</enabled>|s' "$OSSEC_CONF" 2>/dev/null || true
-        ok "ossec.conf Enrollment-Konfiguration bereinigt"
-    fi
+    # Enrollment-Block sauber schreiben – verhindert doppelte <enabled>-Einträge
+    # wenn das Script mehrfach auf demselben Host läuft
+    python3 -c "
+import re
+with open('$OSSEC_CONF', 'r') as f:
+    c = f.read()
+# Enrollment-Block komplett neu schreiben mit sauberem <enabled>yes</enabled>
+c = re.sub(
+    r'<enrollment>.*?</enrollment>',
+    '<enrollment>\n      <enabled>yes</enabled>\n      <agent_name>${AGENT_NAME}</agent_name>\n      <groups>${AGENT_GROUP}</groups>\n    </enrollment>',
+    c, flags=re.DOTALL)
+with open('$OSSEC_CONF', 'w') as f:
+    f.write(c)
+" && ok "ossec.conf Enrollment-Block bereinigt" || warn "Enrollment-Bereinigung fehlgeschlagen – ossec.conf manuell prüfen" 
 fi
 
 # =============================================================================

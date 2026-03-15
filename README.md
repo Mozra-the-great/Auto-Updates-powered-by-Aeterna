@@ -165,3 +165,27 @@ cat ~/.ssh/id_rsa.pub
 ```bash
 ssh-keygen -t ed25519 -C "mein-server"
 ```
+---
+
+### Wazuh SIEM – Installationsscripts
+
+#### `wazuh-lxc-create.sh` – LXC Container auf Proxmox erstellen
+Führt auf dem **Proxmox-Host** aus. Erstellt einen vorbereiteten Debian 12 Container (8GB RAM, 4 Cores, 60GB) für Wazuh.
+IP, CTID und Storage oben im Script anpassen, dann:
+```bash
+bash wazuh-lxc-create.sh
+```
+
+#### `wazuh-install.sh` – Wazuh All-in-One im Container
+Führt **im Wazuh-Container** aus (`pct enter <CTID>`):
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/wazuh-install.sh)
+```
+Installiert Wazuh Manager, Indexer und Dashboard. Das Admin-Passwort wird am Ende angezeigt und unter `/root/wazuh-passwords.txt` gesichert. Dauert 10–20 Minuten.
+
+#### `wazuh-agent-install.sh` – Agent auf überwachten Servern
+Auf jedem Server der überwacht werden soll:
+```bash
+WAZUH_MANAGER="<Wazuh-IP>" bash <(curl -fsSL https://raw.githubusercontent.com/Mozra-the-great/Auto-Updates-powered-by-Aeterna/main/wazuh-agent-install.sh)
+```
+Installiert und registriert den Agent automatisch. Funktioniert auf Debian LXC Containern, der Wings VM und Oracle Cloud.

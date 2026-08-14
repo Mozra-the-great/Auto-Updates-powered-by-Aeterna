@@ -276,3 +276,9 @@ REMOVE_UNUSED_DEPS="true"  # Verwaiste Pakete automatisch entfernen
 ```
 
 Einfach vor dem Ausführen anpassen oder die Datei lokal bearbeiten.
+
+---
+
+## Lizenz
+
+GNU General Public License v3.0 — siehe [LICENSE](LICENSE).

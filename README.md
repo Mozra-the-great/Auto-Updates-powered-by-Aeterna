@@ -1,5 +1,8 @@
 # Auto-Updates – powered by Aeterna™
 
+> **EOL – nicht mehr gepflegt (seit Oktober 2026).**
+> Dieses Repository wird nicht mehr weiterentwickelt und ist archiviert. **Die Scripts bitte nicht mehr verwenden:** sie würden veraltete `unattended-upgrades`-Einstellungen setzen, zum Beispiel eine reine Security-Origin-Liste ohne Basis-Suite. Dadurch können abhängige Pakete nur teilweise aktualisiert werden. Der Inhalt bleibt nur zur Ansicht erhalten.
+
 > **powered by Aeterna™**  
 > Dieses Repository und alle enthaltenen Scripts wurden mithilfe von KI (Claude by Anthropic) erstellt.  
 > Alle Scripts vor der Ausführung prüfen – keine Haftung für Schäden.
